@@ -5,7 +5,7 @@
 
 int main()
 {
-    auto i = dying::SingletonLoggerManager::getInstance();
+    auto & i = dying::SingletonLoggerManager::getInstance();
     auto logger = i.getLogger("ERROR");
     //设置appender 信息{目标位置， 格式}
     dying::FileLogAppender::ptr file_appender(new dying::FileLogAppender("./log.txt"));

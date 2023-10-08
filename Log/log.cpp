@@ -19,13 +19,16 @@ namespace dying{
     }
 
     void Logger::addAppender(LogAppender::ptr appender) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         if(!appender->getFormatter()){
+            std::lock_guard<std::mutex> ll(appender->m_mutex);
             appender->m_formatter = m_formatter;
         }
         m_appenders.push_back(appender);
     }
 
     void Logger::delAppender(LogAppender::ptr appender) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         for(auto it = m_appenders.begin();
                 it != m_appenders.end(); it++){
             if(*it == appender){
@@ -38,6 +41,7 @@ namespace dying{
     void Logger::log(dying::LogLevel::Level level, LogEvent::ptr event) {
         if(level >= m_level){
             auto self = shared_from_this();
+            std::lock_guard<std::mutex> lock(m_mutex);
             if(!m_appenders.empty()){
                 for(auto &i : m_appenders){
                     i->log(self , level , event);
@@ -65,8 +69,10 @@ namespace dying{
     }
 
     void Logger::setFormatter(LogFormatter::ptr val) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_formatter = val;
         for(auto & i : m_appenders){
+            std::lock_guard<std::mutex> ll(i->m_mutex);
             if(!i->m_hasFormatter){
                 i->m_formatter = m_formatter;
             }
@@ -86,10 +92,12 @@ namespace dying{
     }
 
     LogFormatter::ptr Logger::getFormatter() {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_formatter;
     }
 
-    void Logger::clearAppender() {
+    void Logger::clearAppenders() {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_appenders.clear();
     }
 
@@ -99,6 +107,7 @@ namespace dying{
     }
 
     bool FileLogAppender::reopen() {
+        std::lock_guard<std::mutex> lock(m_mutex);
         if(m_filestream){
             m_filestream.close();
         }
@@ -113,6 +122,7 @@ namespace dying{
                 reopen();
                 m_lastTime = now;
             }
+            std::lock_guard<std::mutex> lock(m_mutex);
             if(!m_formatter->format(m_filestream , logger , level , event)){
                 std::cout<<"error"<<std::endl;
             }
@@ -202,6 +212,7 @@ namespace dying{
     }
 
     void LogAppender::setFormatter(LogFormatter::ptr val) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_formatter = val;
         if(m_formatter){
             m_hasFormatter = true;
@@ -210,7 +221,8 @@ namespace dying{
         }
     }
 
-    LogFormatter::ptr LogAppender::getFormatter() const {
+    LogFormatter::ptr LogAppender::getFormatter()  {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_formatter;
     }
 class MessageFormatItem : public LogFormatter::FormatItem{
@@ -335,6 +347,7 @@ class TabFormatItem : public LogFormatter::FormatItem {
 
     void StdoutLogAppender::log(std::shared_ptr<Logger> logger, dying::LogLevel::Level level, LogEvent::ptr event) {
         if(level >= m_level){
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_formatter->format(std::cout , logger , level , event);
         }
     }
@@ -362,7 +375,7 @@ class TabFormatItem : public LogFormatter::FormatItem {
     // %xxx %xxx{xxx} %%
     void LogFormatter::init() {
         //str format type
-        std::vector<std::tuple<std::string,std::string,int>> vec;
+       std::vector<std::tuple<std::string,std::string,int>> vec;
         std::string nstr;
         for(size_t i = 0; i < m_pattern.size(); ++i) {
             if (m_pattern[i] != '%') {
@@ -474,15 +487,16 @@ class TabFormatItem : public LogFormatter::FormatItem {
     }
 
     Logger::ptr SingletonLoggerManager::getLogger(const std::string &name) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         auto it = m_loggers.find(name);
         if(it != m_loggers.end()) {
             return it->second;
         }
 
-        Logger::ptr logger(new Logger(name));
+        Logger::ptr logger = std::make_shared<Logger>(name);
         logger->m_root = m_root;
         m_loggers[name] = logger;
-        return logger;
+        return m_loggers.find(name)->second;
     }
 
     void SingletonLoggerManager::init() {

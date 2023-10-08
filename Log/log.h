@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <mutex>
 #include <map>
 #include <stdarg.h>
 
@@ -191,17 +192,16 @@ namespace dying{
         //更改日志格式器
         void setFormatter(LogFormatter::ptr val);
         //获取日志格式器
-        [[nodiscard]] LogFormatter::ptr  getFormatter() const;
+        [[nodiscard]] LogFormatter::ptr  getFormatter() ;
 
         [[nodiscard]] LogLevel::Level getLevel()const {return m_level;}
         void setLevel(LogLevel::Level level){m_level = level;}
     protected:
-        //日志级别
-        LogLevel::Level m_level = LogLevel::Level::DEBUG;
-        //是否有自己的日志格式器
-        bool m_hasFormatter = false;
-        //日志格式器
-        LogFormatter::ptr m_formatter;
+
+        LogLevel::Level m_level = LogLevel::Level::DEBUG; //日志级别
+        bool m_hasFormatter = false;                      //是否有自己的日志格式器
+        LogFormatter::ptr m_formatter;                    //日志格式器
+        std::mutex m_mutex;
     };
 
     //输出到控制台的Appender
@@ -248,7 +248,7 @@ namespace dying{
         //删除日志目标
         void delAppender(LogAppender::ptr appender);
         //清空日志目标
-        void clearAppender();
+        void clearAppenders();
 
         LogLevel::Level getLevel() const {return m_level;}
         void setLevel(LogLevel::Level val){m_level = val;}
@@ -265,11 +265,12 @@ namespace dying{
         std::list<LogAppender::ptr> m_appenders;    // Appender 集合
         LogFormatter::ptr m_formatter;              // 日志格式器
         Logger::ptr m_root;     //主日志器，如果当前日志未定义，使用主日志输出
+        std::mutex m_mutex;
     };
 
     class SingletonLoggerManager{
     public:
-        static SingletonLoggerManager & getInstance(){
+        static  SingletonLoggerManager & getInstance(){
             static SingletonLoggerManager manager ;
             return manager;
         }
@@ -282,6 +283,7 @@ namespace dying{
         void init();
         std::map<std::string , Logger::ptr > m_loggers;
         Logger::ptr m_root;
+        std::mutex m_mutex;
     };
 }
 
