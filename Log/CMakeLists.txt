@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.13)
 project(dyingLog)
 
 #aux_source_directory(log.cpp SRC)
@@ -7,5 +7,5 @@ set(LIBRARY_OUTPUT_PATH ${LIBPATH})
 #generate static library
 add_library(${LIBLOG} STATIC log.cpp)
 
-add_executable(sample sample.cpp)
-target_link_libraries(sample ${LIBLOG})
+add_executable(LogSample sample.cpp)
+target_link_libraries(LogSample ${LIBLOG})

@@ -29,6 +29,7 @@ namespace dying {
         virtual ~Schedule() = default;
         // 添加任务
         virtual void append(std::shared_ptr<T> request , int priority = 0) = 0;
+        virtual int getThreadNumbers() = 0;
 
     protected:
         int m_maxThreads ; // 最大线程数
@@ -84,6 +85,9 @@ namespace dying {
             }
             m_cond.notify_one();
         }
+        int getThreadNumbers() override{
+            return m_threads.size();
+        }
     private:
         std::mutex m_mutex;                                     //保护共享资源的互斥锁
         std::condition_variable m_cond;                         // 条件变量
@@ -115,6 +119,9 @@ namespace dying {
         ThreadPool(ThreadPool&&) = default;
         void append(std::shared_ptr<T> request , int priority = 0){
             m_schedule->append(request , priority);
+        }
+        int getThreadNumbers(){
+            return m_schedule->getThreadNumbers();
         }
     private:
         std::shared_ptr<Schedule<T>> m_schedule; //调度类
