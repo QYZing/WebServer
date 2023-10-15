@@ -10,13 +10,13 @@ class Test_ThreadPool
 public:
     Test_ThreadPool() = default;
     void operator() (){
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(mutex);
       share++;
     }
 
 public:
     static inline  int share = 0;
-    static inline std::mutex m_mutex = {};
+    static inline std::mutex mutex = {};
 };
 
 TEST(ThreadPool , RANGE_SCHEDULE)

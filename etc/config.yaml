@@ -1,0 +1,15 @@
+Log:
+  openLog : true
+  terminalLog : false
+Timer:
+  type : "HEAP_TIMER" #定时器类型
+
+ThreadPool:
+  minThreads : 10         #最小线程数
+  maxThreads : 10000      #最大线程数
+  type : "RANGE_SCHEDULE" #线程池调度类型
+WebServer:
+  port : 1111
+  trigMode : 3      #事件模型 3 ET 0 LT
+  optLinger : true  #优雅关闭连接
+  timeoutMS : 60000 #客户端超时时长
