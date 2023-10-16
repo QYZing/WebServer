@@ -1,6 +1,6 @@
 Log:
   openLog : true
-  terminalLog : false
+  terminalLog : true
 Timer:
   type : "HEAP_TIMER" #定时器类型
 

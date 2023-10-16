@@ -17,7 +17,14 @@ set(HEADPATH ${PROJECT_SOURCE_DIR}/code/Log
         ${PROJECT_SOURCE_DIR}/code/Config
         ${PROJECT_SOURCE_DIR}/yaml-cpp/include
         )
+set(TESTPATH ${PROJECT_SOURCE_DIR}/build/test)
 
+set(LIBLOG log)
+set(LIBTHREADPOOL threadpool)
+set(LIBTIMER timer)
+set(LIBEPOLLER epoller)
+set(LIBBUFFER buffer)
+set(LIBHTTP http)
 set(LIBWEBSERVER webserver)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/code)
@@ -31,7 +38,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 link_directories(${LIBPATH})
 include_directories(${HEADPATH})
 
-
 add_executable(main main.cpp)
 target_link_libraries(main ${LIBWEBSERVER})
 target_link_libraries(main ${PROJECT_SOURCE_DIR}/yaml-cpp/lib/libyaml-cpp.a)
+

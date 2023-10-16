@@ -7,11 +7,5 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
 
 set(LIBRARY_OUTPUT_PATH ${LIBPATH})
-
 include_directories(${HEADPATH})
-
-
 add_library(${LIBTHREADPOOL} STATIC ThreadPool.cpp)
-
-add_executable(ThreadPoolSample sample.cpp)
-target_link_libraries(ThreadPoolSample ${LIBLOG})

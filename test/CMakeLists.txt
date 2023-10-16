@@ -5,23 +5,20 @@ project(test1)
 #搜索源文件
 aux_source_directory(./ SRC)
 include_directories(${HEADPATH})
+
 # include static lib path
 link_directories(${LIBPATH})
+
 # linking static library , remember contain lib path
-link_libraries(${LIBLOG})
-link_libraries(${LIBBUFFER})
-link_libraries(gtest)
-set(EXECUTABLE_OUTPUT_PATH  ${EXECPATH})
 
-message("set out path" ${EXECPATH})
+set(EXECUTABLE_OUTPUT_PATH  ${TESTPATH})
 
-enable_testing()
-add_test(test_buffer TEST_Buffer.cpp)
-add_test(test_log Test_Log.cpp)
+macro (add_test_exec exec_name)
+    add_executable ("TEST_${exec_name}" "TEST_${exec_name}.cpp")
+    target_link_libraries("TEST_${exec_name}" ${ARGN} gtest)
+endmacro (add_test_exec)
 
-#if(SRC)
-#    add_executable(test ${SRC})
-#    message("生成可执行文件 test")
-#else()
-#    message("没有指定 SRC 变量，不生成可执行文件")
-#endif()
+add_test_exec (Buffer ${LIBBUFFER})
+add_test_exec (Timer ${LIBTIMER})
+add_test_exec (ThreadPool ${LIBTHREADPOOL})
+add_test_exec (WebServer)

@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 project(WebServer)
 
-set(LIBLOG log)
-set(LIBTHREADPOOL threadpool)
-set(LIBTIMER timer)
-set(LIBEPOLLER epoller)
-set(LIBBUFFER buffer)
-set(LIBHTTP http)
-
 add_subdirectory(Config)
 add_subdirectory(Log)
 add_subdirectory(Buffer)

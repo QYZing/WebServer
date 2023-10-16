@@ -13,7 +13,6 @@
 #include <condition_variable>
 #include <mutex>
 
-#include <Log.h>
 
 namespace dying {
 
@@ -50,7 +49,6 @@ namespace dying {
             }
             for(int i = 0 ; i < m_minThreads; i++){
                 m_threads.at(i) = std::make_shared<std::thread>([this](){
-                    LOG_INFO(m_loggerManager.getLogger("INFO")) << "thread created" ;
                     std::unique_lock<std::mutex> locker(m_mutex);
                     while(true){
                         if(!m_tasks.empty()){
@@ -62,7 +60,6 @@ namespace dying {
                         }else if(m_isClose) break;
                         else m_cond.wait(locker);
                     }
-                    LOG_INFO(m_loggerManager.getLogger("INFO")) << "thread dying";
                 });
                 //m_threads.at(i)->detach();
             }
@@ -93,7 +90,6 @@ namespace dying {
         std::condition_variable m_cond;                         // 条件变量
         std::queue<T> m_tasks;                 // 任务队列
         std::vector<std::shared_ptr<std::thread>> m_threads;    // 线程队列
-        dying::SingletonLoggerManager& m_loggerManager =  dying::SingletonLoggerManager::getInstance();
         bool m_isClose = false;
     };
 

@@ -4,11 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <Buffer.h>
-#include <iostream>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+
 
 TEST(Buffer , read)
 {
@@ -34,4 +31,10 @@ TEST(Buffer , read)
     std::string readAll = buffer.retrieveAllToStr();
     EXPECT_EQ(readAll , buf);
     EXPECT_EQ(0 , buffer.readableBytes());
+}
+
+GTEST_API_ int main(int argc, char **argv)
+{
+    testing::InitGoogleTest(&argc , argv);
+    return RUN_ALL_TESTS();
 }
