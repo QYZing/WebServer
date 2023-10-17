@@ -50,7 +50,7 @@ ssize_t dying::HttpConn::write(int *saveErrno) {
     do{
         len = writev(m_fd, m_iov , m_iovCnt);
         LOG_DEBUG_DEFAULT << "write len = "<< len << "path = "<<m_request.path().c_str();
-        LOG_DEBUG_DEFAULT << "write content" << (char *)m_iov[0].iov_base <<"-----" <<(char *)m_iov[1].iov_base;
+        //LOG_DEBUG_DEFAULT << "write content" << (char *)m_iov[0].iov_base <<"-----" <<(char *)m_iov[1].iov_base;
         if(len < 0){
             *saveErrno = errno;
             LOG_ERROR_DEFAULT << "write error "<<strerror(errno) << " path = "<<m_request.path().c_str()<<" errno = "<<errno;
@@ -81,7 +81,7 @@ void dying::HttpConn::close() {
         m_isClose = true;
         userCount--;
         ::close(m_fd);
-        LOG_FMT_INFO_DEFAULT("Client[%d](%s:%d) quit, UserCount:%d", m_fd, getIP(), getPort(), (int)userCount);
+        LOG_FMT_DEBUG_DEFAULT("Client[%d](%s:%d) quit, UserCount:%d", m_fd, getIP(), getPort(), (int)userCount);
     }
 }
 

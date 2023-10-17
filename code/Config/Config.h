@@ -11,6 +11,7 @@ namespace dying{
     struct Config{
         struct Log{
             bool openLog = true;
+            bool debug = false;
             bool terminalLog = false;
         };
         struct Timer{
@@ -41,6 +42,7 @@ namespace YAML{
             Node node;
             node["Log"]["openLog"] = rhs.log.openLog;
             node["Log"]["terminalLog"] = rhs.log.terminalLog;
+            node["Log"]["debug"] = rhs.log.debug;
 
             node["Timer"]["type"] = rhs.timer.type;
 
@@ -61,6 +63,7 @@ namespace YAML{
 //            }
             rhs.log.openLog = node["Log"]["openLog"].as<bool>();
             rhs.log.terminalLog = node["Log"]["terminalLog"].as<bool>();
+            rhs.log.debug = node["Log"]["debug"].as<bool>();
 
             rhs.timer.type = node["Timer"]["type"].as<std::string>();
 

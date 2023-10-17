@@ -25,13 +25,13 @@ namespace dying {
     class WebServer {
     public:
         WebServer(int port , int trigMode , int timeoutMS , bool optLinger,
-                  int threadNum , bool openLog , bool terminalLog);
+                  int threadNum , bool openLog , bool terminalLog, bool debug);
         WebServer(dying::Config config);
         ~WebServer();
     public:
         void start();
     private:
-        void initLog(bool terminal = true);
+        void initLog(bool terminal = true , bool debug = false);
         bool initSocket();
         void initEventMode(int trigMode);
         void addClient(int fd , sockaddr_in addr);

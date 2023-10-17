@@ -6,14 +6,14 @@
 #include "WebServer.h"
 
 dying::WebServer::WebServer(int port, int trigMode, int timeoutMS, bool optLinger
-                            , int threadNum, bool openLog , bool terminalLog)
+                            , int threadNum, bool openLog , bool terminalLog , bool debug)
                             :m_port(port), m_openLinger(optLinger)
                             ,m_timeoutMS(timeoutMS),m_isClose(false)
                             {
     if(openLog == false){
         dying::SingletonLoggerManager::getInstance().close();
     }else {
-        initLog(terminalLog);
+        initLog(terminalLog, debug);
     }
     m_timer = std::make_unique<dying::Timer>(Timer::HEAP_TIMER);
     m_threadPool = std::make_unique<dying::ThreadPool<>>(threadNum);
@@ -51,7 +51,7 @@ dying::WebServer::WebServer(dying::Config config)
         dying::SingletonLoggerManager::getInstance().close();
     }
     else {
-        initLog( config.log.terminalLog);
+        initLog( config.log.terminalLog , config.log.debug);
     }
     m_timer = std::make_unique<dying::Timer>(Timer::HEAP_TIMER);
     m_epoller = std::make_unique<dying::Epoller>();
@@ -90,7 +90,7 @@ dying::WebServer::~WebServer() {
     m_isClose = true;
     free(m_srcDir);
 }
-void dying::WebServer::initLog(bool terminal){
+void dying::WebServer::initLog(bool terminal , bool debug ){
     auto DEBUG = SingletonLoggerManager::getInstance().getLogger("DEBUG");
     auto INFO = SingletonLoggerManager::getInstance().getLogger("INFO");
     auto ERROR = SingletonLoggerManager::getInstance().getLogger("ERROR");
@@ -99,12 +99,12 @@ void dying::WebServer::initLog(bool terminal){
 
 
     dying::LogAppender::ptr file_appender;
+    dying::LogFormatter::ptr fmt(new dying::LogFormatter("\"%d{%Y-%m-%d %H:%M:%S}%T%t%T[%p]%T%f:%l%T%m\"%n"));
     if(terminal){
         file_appender = std::make_shared<dying::StdoutLogAppender>();
     }else{
         file_appender = std::make_shared<dying::FileLogAppender>("./log.txt");
     }
-    dying::LogFormatter::ptr fmt(new dying::LogFormatter("\"%d{%Y-%m-%d %H:%M:%S}%T%t%T[%p]%T%f:%l%T%m\"%n"));
     file_appender->setFormatter(fmt);
 
 #define XX(name) \
@@ -114,11 +114,20 @@ void dying::WebServer::initLog(bool terminal){
 
     XX(DEBUG);
     XX(INFO);
-    XX(ERROR);
     XX(WARN);
+#undef XX
+    if(!debug){
+        dying::SingletonLoggerManager::getInstance().getLogger("DEBUG")->setLevel(dying::LogLevel::FATAL);
+    }
+    dying::LogAppender::ptr error_appender = std::make_shared<dying::FileLogAppender>("./ErrLog.txt");
+#define XX(name) \
+    name->clearAppenders(); \
+    name->addAppender(error_appender);\
+    name->setLevel(LogLevel::name);  \
+
+    XX(ERROR);
     XX(FATAL);
 #undef XX
-    dying::SingletonLoggerManager::getInstance().getLogger("DEBUG")->setLevel(dying::LogLevel::FATAL);
 }
 bool dying::WebServer::initSocket() {
     int ret;
@@ -325,7 +334,6 @@ void dying::WebServer::onWrite(dying::HttpConn *client) {
             return ;
         }
     }
-    LOG_FMT_INFO_DEFAULT("Client[%d] quit!", client->getFd());
     closeConn(client);
 }
 
@@ -359,7 +367,6 @@ void dying::WebServer::start() {
     }
     while(!m_isClose){
         if(m_timeoutMS > 0 && TICKMS != -1) {
-            //TODO need fix 无事件阻塞
              m_timer->tick();
         }
         int eventCnt = m_epoller->wait(TICKMS);// 超时时长
@@ -395,4 +402,4 @@ void dying::WebServer::start() {
 
 
 // bug 1: m_listenEvent   使用LT模式正常工作，ET模式异常，浏览器无法接收完全数据
-// result: ~accpet那块的while循环写成 m_listendEvent & EPOLLIN 想当与false
+// result: ~ accpet那块的while循环写成 m_listendEvent & EPOLLIN 想当与false

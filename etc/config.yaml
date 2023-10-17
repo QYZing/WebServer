@@ -1,11 +1,12 @@
 Log:
-  openLog : true
-  terminalLog : true
+  openLog : false
+  debug : true
+  terminalLog : false
 Timer:
   type : "HEAP_TIMER" #定时器类型
 
 ThreadPool:
-  minThreads : 10         #最小线程数
+  minThreads : 1000         #最小线程数
   maxThreads : 10000      #最大线程数
   type : "RANGE_SCHEDULE" #线程池调度类型
 WebServer:
