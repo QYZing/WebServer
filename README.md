@@ -20,7 +20,7 @@
 
 ## 压力测试
 
-![webbench](D:\212100811\WebServer\WebServer\assets\webbench.png)
+![webbench](webbench.png)
 
 ## 项目启动
 
