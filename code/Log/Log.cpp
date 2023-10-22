@@ -5,12 +5,16 @@
 #include <map>
 #include <iostream>
 #include <functional>
+#include <thread>
 #include <sys/syscall.h>
 #include <unistd.h>
 
 namespace dying{
 
-    int32_t GetThreadId(){ return static_cast<int32_t>(syscall(SYS_gettid));}
+    int32_t GetThreadId(){ 
+        auto id = std::this_thread::get_id(); 
+        return *(int32_t *)&id;
+    }
     int32_t GetFiberId(){ return 0;}
     std::string dying::Thread::GetName() {
          return "null";
