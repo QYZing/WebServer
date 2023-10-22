@@ -491,14 +491,15 @@ class TabFormatItem : public LogFormatter::FormatItem {
     }
 
     Logger::ptr SingletonLoggerManager::getLogger(const std::string &name) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        if(m_isclose){ //关闭不可逆
+            return m_root;
+        }
+
         auto it = m_loggers.find(name);
         if(it != m_loggers.end()) {
             return it->second;
         }
-        if(m_isclose){ //关闭不可逆
-            return m_root;
-        }
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         Logger::ptr logger = std::make_shared<Logger>(name);
         logger->m_root = m_root;
