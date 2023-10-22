@@ -46,6 +46,7 @@ namespace dying{
         virtual void tick() = 0;
         virtual void clear() = 0;
 
+        virtual void setInfo(void * arg){}
     };
 
     // 毫秒计时
@@ -89,6 +90,8 @@ namespace dying{
         void tick() override;
 
         void clear() override;
+
+        void setInfo(void * arg) override;
     private:
         struct TimeWheelNode : public  TimerNode{
             TimeWheelNode(int id, const TimeoutCallBack &callBack, const TimeStamp &expires
@@ -99,7 +102,7 @@ namespace dying{
         typedef std::list<TWptr> TWptrList;
     private:
         static const int N = 60;
-        static const int SI = 1000;
+        const int SI = 10;
         std::array<TWptrList, N> m_slots;
         std::unordered_map<int , TWptrList::iterator > m_ref;
         int cur_slot = 0;
@@ -139,6 +142,9 @@ namespace dying{
         }
         void clear(){
             m_timerInstance->clear();
+        }
+        void setInfo(void * arg){
+            m_timerInstance->setInfo(arg);
         }
     private:
         std::shared_ptr<TimerBase> m_timerInstance;

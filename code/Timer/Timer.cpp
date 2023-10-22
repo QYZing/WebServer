@@ -198,6 +198,13 @@ void dying::TimeWheel::clear() {
         i.clear();
     }
 }
+void dying::TimeWheel::setInfo(void * arg) {
+    int * si = reinterpret_cast<int *>(arg);
+    if(si != nullptr){
+        auto & SI = const_cast<int &>(dying::TimeWheel::SI);
+        SI = *si;
+    }
+}
 
 dying::TimeWheel::TimeWheelNode::TimeWheelNode(int id, const dying::TimeoutCallBack &callBack,
                                                const dying::TimeStamp &expires , int time_slot)

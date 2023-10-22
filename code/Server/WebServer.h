@@ -50,7 +50,7 @@ namespace dying {
 
     private:
         static const int MAX_FD = 65536;
-        static const int TICKMS = 1000; //默认1000ms 定时器
+        static const int TICKMS = 10; //默认1000ms 定时器
         static int setFdNonblock(int fd);
     private:
         int m_port;

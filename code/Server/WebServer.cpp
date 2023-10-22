@@ -53,7 +53,14 @@ dying::WebServer::WebServer(dying::Config config)
     else {
         initLog( config.log.terminalLog , config.log.debug);
     }
-    m_timer = std::make_unique<dying::Timer>(Timer::HEAP_TIMER);
+    if(config.timer.type == "HEAP_TIMER"){
+        m_timer = std::make_unique<dying::Timer>(Timer::HEAP_TIMER);
+    }else{
+        m_timer = std::make_unique<dying::Timer>(Timer::TIME_WHEEL);
+        std::shared_ptr<int> s(new int(this->TICKMS));
+        m_timer->setInfo(s.get());
+    }
+
     m_epoller = std::make_unique<dying::Epoller>();
     if(config.threadPool.type == "RANGE_SCHEDULE"){
         m_threadPool = std::make_unique<dying::ThreadPool<>>(config.threadPool.minThreads , config.threadPool.maxThreads , dying::ThreadPool<>::RANGE_SCHEDULE);

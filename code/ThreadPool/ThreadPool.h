@@ -86,9 +86,9 @@ namespace dying {
             return m_threads.size();
         }
     private:
-        std::mutex m_mutex;                                     //保护共享资源的互斥锁
+        std::mutex m_mutex;                                     // 保护共享资源的互斥锁
         std::condition_variable m_cond;                         // 条件变量
-        std::queue<T> m_tasks;                 // 任务队列
+        std::queue<T> m_tasks;                                  // 任务队列
         std::vector<std::shared_ptr<std::thread>> m_threads;    // 线程队列
         bool m_isClose = false;
     };
