@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
 project(WebServer)
 
+
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -pg -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+
 #静态库生成路径
 set(LIBPATH ${PROJECT_SOURCE_DIR}/build/lib)
 #可执行程序的存储目录
@@ -31,14 +36,11 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/code)
 add_subdirectory(${PROJECT_SOURCE_DIR}/googletest)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
-SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-
 link_directories(${LIBPATH})
 include_directories(${HEADPATH})
 
-add_executable(main main.cpp)
+add_executable(main main.cpp
+)
 target_link_libraries(main ${LIBWEBSERVER})
 target_link_libraries(main ${PROJECT_SOURCE_DIR}/yaml-cpp/lib/libyaml-cpp.a)
 

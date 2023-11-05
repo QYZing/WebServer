@@ -93,8 +93,9 @@ dying::WebServer::WebServer(dying::Config config)
     }
 }
 dying::WebServer::~WebServer() {
-    ::close(m_listenFd);
+    m_threadPool->~ThreadPool();
     m_isClose = true;
+    ::close(m_listenFd);
     free(m_srcDir);
 }
 void dying::WebServer::initLog(bool terminal , bool debug ){
@@ -372,9 +373,12 @@ void dying::WebServer::start() {
         LOG_INFO_DEFAULT << "===================================================";
         LOG_INFO_DEFAULT << "===================================================";
     }
+    int close = 10000;
     while(!m_isClose){
         if(m_timeoutMS > 0 && TICKMS != -1) {
              m_timer->tick();
+             close--;
+             if(close <=0 ) break;
         }
         int eventCnt = m_epoller->wait(TICKMS);// 超时时长
         for(int i = 0; i < eventCnt; i++){

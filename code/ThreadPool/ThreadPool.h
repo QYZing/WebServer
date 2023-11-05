@@ -20,8 +20,8 @@ namespace dying {
     class Schedule{
     public:
         explicit Schedule(int minThreads = 8 , int maxThreads = 1000)
-            : m_minThreads(minThreads)
-            , m_maxThreads(maxThreads){
+            : m_maxThreads(maxThreads)
+            , m_minThreads(minThreads){
         }
         Schedule(Schedule&) = default;
         Schedule(Schedule&&) = default;
@@ -103,16 +103,17 @@ namespace dying {
         explicit ThreadPool(int minThreads = 8 , int maxThreads = 1000 , int schedule = RANGE_SCHEDULE){
             switch (schedule) {
                 case RANGE_SCHEDULE:{
-                    m_schedule = std::make_shared<RangeSchedule<T>>(minThreads , maxThreads);
+                    m_schedule = std::make_unique<RangeSchedule<T>>(minThreads , maxThreads);
                     break;
                 }
                 default:{
-                    m_schedule = std::make_shared<RangeSchedule<T>>(minThreads , maxThreads);
+                    m_schedule = std::make_unique<RangeSchedule<T>>(minThreads , maxThreads);
                 }
             }
         }
         ThreadPool(ThreadPool&) = default;
         ThreadPool(ThreadPool&&) = default;
+        ~ThreadPool() = default;
         void append(T request , int priority = 0){
             m_schedule->append(request , priority);
         }
@@ -120,7 +121,7 @@ namespace dying {
             return m_schedule->getThreadNumbers();
         }
     private:
-        std::shared_ptr<Schedule<T>> m_schedule; //调度类
+        std::unique_ptr<Schedule<T>> m_schedule; //调度类
     };
 
 
