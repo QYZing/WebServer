@@ -5,10 +5,11 @@
 
 #include "WebServer.h"
 
-dying::WebServer::WebServer(int port, int trigMode, int timeoutMS, bool optLinger
+dying::WebServer::WebServer(int port, int trigMode, int timeoutMS, int tickMS, bool optLinger
                             , int threadNum, bool openLog , bool terminalLog , bool debug)
                             :m_port(port), m_openLinger(optLinger)
-                            ,m_timeoutMS(timeoutMS),m_isClose(false)
+                            ,m_timeoutMS(timeoutMS) ,m_tickMS(tickMS)
+                            ,m_isClose(false)
                             {
     if(openLog == false){
         dying::SingletonLoggerManager::getInstance().close();
@@ -46,7 +47,8 @@ dying::WebServer::WebServer(int port, int trigMode, int timeoutMS, bool optLinge
 }
 dying::WebServer::WebServer(dying::Config config)
         :m_port(config.webServer.port), m_openLinger(config.webServer.optLinger)
-        ,m_timeoutMS(config.webServer.timeoutMS),m_isClose(false){
+        ,m_timeoutMS(config.webServer.timeoutMS),m_tickMS(config.webServer.tickMS),
+        m_isClose(false){
     if(!config.log.openLog){
         dying::SingletonLoggerManager::getInstance().close();
     }
@@ -57,7 +59,7 @@ dying::WebServer::WebServer(dying::Config config)
         m_timer = std::make_unique<dying::Timer>(Timer::HEAP_TIMER);
     }else{
         m_timer = std::make_unique<dying::Timer>(Timer::TIME_WHEEL);
-        std::shared_ptr<int> s(new int(this->TICKMS));
+        std::shared_ptr<int> s(new int(this->m_tickMS));
         m_timer->setInfo(s.get());
     }
 
@@ -375,12 +377,12 @@ void dying::WebServer::start() {
     }
     int close = 10000;
     while(!m_isClose){
-        if(m_timeoutMS > 0 && TICKMS != -1) {
+        if(m_timeoutMS > 0 && m_tickMS != -1) {
              m_timer->tick();
              close--;
              if(close <=0 ) break;
         }
-        int eventCnt = m_epoller->wait(TICKMS);// 超时时长
+        int eventCnt = m_epoller->wait(m_tickMS);// 超时时长
         for(int i = 0; i < eventCnt; i++){
             //处理事件
             int fd = m_epoller->getEventFd(i);

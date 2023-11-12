@@ -27,6 +27,7 @@ namespace dying{
             int trigMode = 3; //事件模型 3 ET 0 LT
             bool optLinger = true; //优雅关闭连接
             int timeoutMS = 60000; //客户端超时时长
+            int tickMS = 10; //处理时间
         };
         Log log;
         Timer timer;
@@ -54,6 +55,7 @@ namespace YAML{
             node["WebServer"]["trigMode"] = rhs.webServer.trigMode;
             node["WebServer"]["optLinger"] = rhs.webServer.optLinger;
             node["WebServer"]["timeoutMS"] = rhs.webServer.timeoutMS;
+            node["WebServer"]["tickMS"] = rhs.webServer.tickMS;
             return node;
         }
 
@@ -75,6 +77,7 @@ namespace YAML{
             rhs.webServer.trigMode = node["WebServer"]["trigMode"].as<int>();
             rhs.webServer.optLinger= node["WebServer"]["optLinger"].as<bool>();
             rhs.webServer.timeoutMS = node["WebServer"]["timeoutMS"].as<int>();
+            rhs.webServer.tickMS = node["WebServer"]["tickMS"].as<int>();
             return true;
         }
     };

@@ -14,3 +14,4 @@ WebServer:
   trigMode : 3      #事件模型 3 ET 0 LT
   optLinger : true  #优雅关闭连接
   timeoutMS : 60000 #客户端超时时长
+  tickMS : 10       #定时器处理间隔

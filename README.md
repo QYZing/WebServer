@@ -48,7 +48,7 @@
 >
 > C++ 17
 >
-> Mysql
+> MySQL
 
 - 克隆后进入WebServer文件夹
 

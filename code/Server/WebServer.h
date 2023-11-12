@@ -24,7 +24,7 @@
 namespace dying {
     class WebServer {
     public:
-        WebServer(int port , int trigMode , int timeoutMS , bool optLinger,
+        WebServer(int port , int trigMode , int timeoutMS , int tickMS, bool optLinger,
                   int threadNum , bool openLog , bool terminalLog, bool debug);
         WebServer(dying::Config config);
         ~WebServer();
@@ -50,12 +50,12 @@ namespace dying {
 
     private:
         static const int MAX_FD = 65536;
-        static const int TICKMS = 10; //默认1000ms 定时器
         static int setFdNonblock(int fd);
     private:
         int m_port;
         bool m_openLinger;
-        int  m_timeoutMS; //客户超时时长
+        const int m_timeoutMS; //客户超时时长
+        const int m_tickMS = 10; //默认1000ms 定时器
         bool m_isClose;
         int  m_listenFd;
         char*m_srcDir;
